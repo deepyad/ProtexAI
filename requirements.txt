@@ -1,0 +1,12 @@
+opencv-python-headless==4.6.0.66
+numpy==1.23.5
+pyyaml==6.0
+tqdm==4.65.0
+# for dedup of images
+imagehash==4.3.1
+Pillow==10.0.0
+jsonschema==4.17.3
+# For Yolo object detection
+ultralytics==8.0.0
+
+

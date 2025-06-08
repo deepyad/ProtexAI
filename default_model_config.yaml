@@ -1,0 +1,18 @@
+# Model configuration 
+# model:
+#   name: yolov8n
+#   confidence_threshold: 0.5
+
+model:
+  path: yolov8n.pt  # Can be local path or Hugging Face URL
+  confidence: 0.5
+
+# Deduplication settings
+deduplication:
+  threshold: 2  # Lower = stricter (0-64), higher = more tolerant
+
+
+# Threshold Meaning:
+# threshold=0: Only identical frames are considered duplicates
+# threshold=2: Allows minor variations (compression artifacts, small movements)
+# threshold=5: Aggressive deduplication for large scene changes
