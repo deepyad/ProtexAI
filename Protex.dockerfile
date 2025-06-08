@@ -8,13 +8,16 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
+# Copy requirements and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY pipeline.py .
+# Copy the entire video_pipeline package and config
+COPY video_pipeline/ ./video_pipeline/
 COPY default_model_config.yaml .
-COPY metrics.py .
 
 EXPOSE 8000
 
-ENTRYPOINT ["python", "pipeline.py"]
+ENTRYPOINT ["python", "-m", "video_pipeline.pipeline"]
+
