@@ -8,5 +8,6 @@ Pillow==10.0.0
 jsonschema==4.17.3
 # For Yolo object detection
 ultralytics==8.0.0
+prometheus-client==0.20.0
 
 
