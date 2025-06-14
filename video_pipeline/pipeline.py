@@ -10,7 +10,7 @@ from PIL import Image
 from ultralytics import YOLO
 from metrics import metrics  # Primary metrics source
 from utility import generate_report, calculate_deduplication_metrics, model_perf_metrics
-from yolo_utills import load_detection_model, detect_objects
+from yolo_utils import load_detection_model, detect_objects
 import argparse
 
 # Configure logging
