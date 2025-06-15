@@ -8,9 +8,9 @@ from prometheus_client import start_http_server
 from imagehash import phash
 from PIL import Image
 from ultralytics import YOLO
-from metrics import metrics  # Primary metrics source
-from utility import generate_report, calculate_deduplication_metrics, model_perf_metrics
-from yolo_utills import load_detection_model, detect_objects
+from .metrics import metrics  # Changed to relative import
+from .utility import generate_report, calculate_deduplication_metrics, model_perf_metrics
+from .yolo_utils import load_detection_model, detect_objects  # Fixed typo and made relative
 import argparse
 
 # Configure logging
@@ -27,6 +27,7 @@ def process_video(input_path, output_dir, config_path):
     
     cap = None
     all_detections = []  # Moved outside try block to maintain scope
+    hashes = set() 
     try:
         # Load config
         with open(config_path) as f:
@@ -47,7 +48,7 @@ def process_video(input_path, output_dir, config_path):
             metrics.frame_drops.set(0)
 
         # Deduplication setup
-        hashes = set()
+        # hashes = set()
         threshold = config.get('deduplication', {}).get('threshold', 2)
 
         while True:
@@ -83,20 +84,25 @@ def process_video(input_path, output_dir, config_path):
             all_detections.extend(detections)  # Collect all detections
             metrics.timings['frame_processing'] += time.time() - proc_start
             
-            # Detection tracking
+
             for det in detections:
                 metrics.detections[det['class']] += 1
                 if metrics.detections_count is not None:
-                    metrics.detections_count.labels(class_=det['class']).inc()
+                    metrics.detections_count.labels(object_class=det['class']).inc()
+
 
             # Save frame
             save_start = time.time()
-            Path(output_dir).mkdir(parents=True, exist_ok=True)
-            cv2.imwrite(f"{output_dir}/frame_{metrics.frame_counts['success']:06d}.jpg", frame)
-            metrics.timings['io'] += time.time() - save_start
-            
-            metrics.frame_counts['success'] += 1
 
+            Path(output_dir).mkdir(parents=True, exist_ok=True)
+            # cv2.imwrite(f"{output_dir}/frame_{metrics.frame_counts['success']:06d}.jpg", frame)
+            
+            if frame is not None and frame.size > 0:
+                cv2.imwrite(f"{output_dir}/frame_{metrics.frame_counts['success']:06d}.jpg", frame)
+            else:
+                logger.warning(f"Skipping invalid frame {metrics.frame_counts['success']}")
+            metrics.frame_counts['success'] += 1
+            metrics.timings['io'] += time.time() - save_start
             # Update processing time metric
             if metrics.processing_time is not None:
                 metrics.processing_time.observe(time.time() - read_start)

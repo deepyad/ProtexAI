@@ -1,8 +1,10 @@
-# metrics.py
+# video_pipeline/metrics.py
 from prometheus_client import Counter, Gauge, Histogram
+from collections import defaultdict
 
 class PipelineMetrics:
     def __init__(self):
+        # Prometheus metrics
         self.frames_processed = Counter(
             'frames_processed_total', 
             'Total frames processed'
@@ -10,7 +12,7 @@ class PipelineMetrics:
         self.detections_count = Counter(
             'detections_total', 
             'Total detections', 
-            ['class']
+            ['object_class']
         )
         self.processing_time = Histogram(
             'processing_seconds',
@@ -21,7 +23,22 @@ class PipelineMetrics:
             'frame_drops_total',
             'Total dropped frames'
         )
+        
+        self.frame_counts = {
+            'total': 0,
+            'success': 0,
+            'dropped': 0,
+            'duplicates': 0
+        }
+        
+        self.detections = defaultdict(int)
+        
+        self.timings = {
+            'video_loading': 0.0,
+            'frame_processing': 0.0,
+            'detection': 0.0,
+            'io': 0.0
+        }
 
 # Singleton instance
 metrics = PipelineMetrics()
-
